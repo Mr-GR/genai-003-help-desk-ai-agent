@@ -1,51 +1,55 @@
-# Getting started help-desk-ai-agent
-Install the initial environment
+# 🤖 Help Desk AI Agent (Local RAG)
 
-## For Mac open Terminal and run the following 
+A local AI-powered help desk agent using:
 
-`pip install numpy pandas matplotlib sickit-learn`
+- FastAPI for backend
+- Qdrant for vector similarity search
+- Sentence Transformers for local embeddings
+- PDF manuals (Mac/Windows/CCNA)
 
-`pip install jupyter`
+All local — no OpenAI, no cloud, no privacy risk. Runs on your MacBook Pro with M3.
 
-## To run a jupyter server run the following
+---
 
-`jupyter notebook`
+## Setup Instructions (Mac)
 
-## Run fastAPI Server
-First ensure that you have installed the following:
-`pip install fastapi`
+### 1. Install dependencies
 
-`pip install uvicorn`
+```bash
+pip install fastapi uvicorn qdrant-client sentence-transformers langchain pypdf python-dotenv
+```
 
-start the server
-`uvicorn main:app --reload`
+## Start Qdrant Locally
+```bash
+docker run -p 6333:6333 -p 6334:6334 qdrant/qdrant
+```
 
-once the server is running go to your browser and enter
-`http://1270.0.1:8000`
-expected return: hello world
+## Upload another PDF Manual
+```bash
+python upload_pdf_to_qdrant.py
+```
 
-Access FastAPI docs
-`http://1270.0.1:8000/docs#`
+## Start FastAPI Server
+```bash
+python main.py
+```
 
-or 
+## Once running, open:
 
-`http://1270.0.1:8000/redoc`
+### Swagger UI: 
+[SwaggerUi](http://localhost:8080/docs)
 
-## Test out fast api 
-Get main server
-`curl -X GET 'http://1270.0.1:8000'`
-expected return: 
-<img width="1512" alt="Screenshot 2025-03-29 at 2 57 14 PM" src="https://github.com/user-attachments/assets/0698d64b-1033-4c1e-8477-41bada64fc6e" />
+### ReDoc: 
+[Docs](http://localhost:8080/redoc)
 
-Create an item
-make sure to change the item from orange to whatever you would like
-`curl -X POST -H "Content-Type: application/json" -d '{"text":"orange"}' 'http://127.0.0.1:8000/items`
-expected return: 
-<img width="1512" alt="Screenshot 2025-03-29 at 2 55 12 PM" src="https://github.com/user-attachments/assets/f8821e0e-53aa-425c-b467-18b57a3e8f93" />
+## Creat a ticket/question
+```bash
+curl -X POST -H "Content-Type: application/json" \
+-d '{"ticket":"How do I reset my Mac password?"}' \
+http://localhost:8080/request
+```
 
-Get all the items
-`curl -X GET 'http://127.0.0.1:8000/items'` 
-expected return:
-<img width="1512" alt="Screenshot 2025-03-29 at 2 55 42 PM" src="https://github.com/user-attachments/assets/efc29eb7-ce81-461d-9745-7ad2d331f682" />
-
-
+## Get all tickets/respones
+```bash
+curl -X GET 'http://localhost:8000/requests' -H 'accept: application/json'
+```

@@ -1,7 +1,7 @@
 import os
 import uvicorn
 import requests
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from pydantic import BaseModel
 from typing import List
 from dotenv import load_dotenv
@@ -9,6 +9,8 @@ from qdrant_client import QdrantClient
 from qdrant_client.http.models import Filter, FieldCondition, MatchValue, SearchRequest
 from sentence_transformers import SentenceTransformer
 import numpy as np
+from fastapi.middleware.cors import CORSMiddleware
+from auth import auth_router
 
 # Load environment variables
 load_dotenv()
@@ -27,7 +29,16 @@ app = FastAPI(
     version='1.0.0'
 )
 
-# Pydantic models
+app.include_router(auth_router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 class RequestTicket(BaseModel):
     ticket: str
     response: str = ""
@@ -38,19 +49,21 @@ class AskRequest(BaseModel):
 class AskResponse(BaseModel):
     answer: str
 
-# In-memory ticket log
 ticket_log: List[RequestTicket] = []
 
-# Load local embedding model
 model = SentenceTransformer(EMBEDDING_MODEL)
 
-# Connect to Qdrant
 qdrant = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
 
-# Routes
 @app.get("/requests")
 async def get_requests():
     return ticket_log
+
+@app.get("/protected-chat")
+def protected_chat(token: str = Header(...)):
+    if not token.startswith("token_for_"):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    return {"message": "You are viewing secure chat content."}
 
 @app.post("/request")
 async def add_request(ticket: RequestTicket):
@@ -90,6 +103,5 @@ async def ask_question(body: AskRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Run server
 if __name__ == "__main__":
     uvicorn.run("main:app", host="localhost", port=8080, reload=True)

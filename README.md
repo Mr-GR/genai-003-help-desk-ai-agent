@@ -1,4 +1,4 @@
-# 🤖 Help Desk AI Agent (Local RAG)
+# 🤖 Help Desk AI Agent RAG
 
 A local AI-powered help desk agent using:
 
@@ -8,8 +8,6 @@ A local AI-powered help desk agent using:
 - **PDF manuals** (Mac/Windows/CCNA)
 - **PostgreSQL** for user authentication
 - **Flutter** (mobile/web) UI
-
-All local — no OpenAI, no cloud, no privacy risk. Runs on your MacBook Pro with M3.
 
 ---
 

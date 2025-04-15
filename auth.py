@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jose import JWTError, jwt
+from fastapi import APIRouter, Depends, HTTPException, status # type: ignore
+from sqlalchemy.orm import Session # type: ignore
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm # type: ignore
+from jose import JWTError, jwt # type: ignore
 from datetime import datetime, timedelta
 from db import schemas, models, crud, database
-from passlib.context import CryptContext
+from passlib.context import CryptContext # type: ignore
 import os
 
 router = APIRouter()

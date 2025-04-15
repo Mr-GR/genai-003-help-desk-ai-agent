@@ -1,8 +1,8 @@
 import os
-import uvicorn
-from fastapi import FastAPI, Header, HTTPException, Depends
-from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
+import uvicorn # type: ignore
+from fastapi import FastAPI, Header, HTTPException, Depends # type: ignore
+from fastapi.middleware.cors import CORSMiddleware # type: ignore
+from dotenv import load_dotenv # type: ignore
 from auth import router as auth_router
 from rag import router as rag_router
 from llm import router as llm_router

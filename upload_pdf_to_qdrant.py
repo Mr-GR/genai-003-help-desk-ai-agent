@@ -1,11 +1,11 @@
 import os
 from uuid import uuid4
-from langchain.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams, PointStruct
-from sentence_transformers import SentenceTransformer
-from tqdm import tqdm
+from langchain.document_loaders import PyPDFLoader # type: ignore
+from langchain.text_splitter import RecursiveCharacterTextSplitter # type: ignore
+from qdrant_client import QdrantClient # type: ignore
+from qdrant_client.models import Distance, VectorParams, PointStruct # type: ignore
+from sentence_transformers import SentenceTransformer # type: ignore
+from tqdm import tqdm # type: ignore
 import re
 
 

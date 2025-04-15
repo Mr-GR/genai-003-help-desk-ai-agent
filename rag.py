@@ -1,9 +1,9 @@
-from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException, Depends # type: ignore
+from pydantic import BaseModel # type: ignore
 from typing import List
-from sentence_transformers import SentenceTransformer
-from qdrant_client import QdrantClient
-from qdrant_client.http.models import ScoredPoint
+from sentence_transformers import SentenceTransformer # type: ignore
+from qdrant_client import QdrantClient # type: ignore
+from qdrant_client.http.models import ScoredPoint # type: ignore
 import os
 from dependencies import get_current_user, TokenData
 

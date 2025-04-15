@@ -1,9 +1,9 @@
-from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel
-import requests, os
-from sentence_transformers import SentenceTransformer
-from qdrant_client import QdrantClient
-from qdrant_client.http.models import SearchRequest, PointStruct, Filter
+from fastapi import APIRouter, HTTPException, Depends # type: ignore
+from pydantic import BaseModel # type: ignore
+import requests, os # type: ignore
+from sentence_transformers import SentenceTransformer # type: ignore
+from qdrant_client import QdrantClient # type: ignore
+from qdrant_client.http.models import SearchRequest, PointStruct, Filter # type: ignore
 from dependencies import get_current_user, TokenData
 
 router = APIRouter()

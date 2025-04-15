@@ -1,6 +1,5 @@
-# 📁 db/models.py
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text # type: ignore
+from sqlalchemy.orm import relationship # type: ignore
 from datetime import datetime
 from .database import Base
 

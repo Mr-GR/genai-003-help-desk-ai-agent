@@ -16,6 +16,20 @@ class TicketResponse(TicketBase):
     class Config:
         from_attributes = True
 
+class ChatMessageBase(BaseModel):
+    role: str  # 'user' or 'ai'
+    message: str
+
+class ChatMessageCreate(ChatMessageBase):
+    pass
+
+class ChatMessageResponse(ChatMessageBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
 class UserBase(BaseModel):
     username: str
 
@@ -39,6 +53,11 @@ class UserCreate(UserBase):
 class UserResponse(UserBase):
     id: int
     tickets: List[TicketResponse] = []
+    chat_messages: List[ChatMessageResponse] = []
 
     class Config:
         from_attributes = True
+
+class TokenData(BaseModel):
+    username: str
+    user_id: int

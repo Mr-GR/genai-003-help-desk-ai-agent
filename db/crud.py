@@ -22,3 +22,25 @@ def create_ticket(db: Session, ticket: schemas.TicketCreate, user_id: int, respo
     db.commit()
     db.refresh(db_ticket)
     return db_ticket
+
+def create_chat_message(db: Session, user_id: int, message: str, role: str):
+    db_message = models.ChatMessage(
+        user_id=user_id,
+        message=message,
+        role=role
+    )
+    db.add(db_message)
+    db.commit()
+    db.refresh(db_message)
+    return db_message
+
+
+
+def get_chat_history(db: Session, user_id: int, limit: int = 50):
+    return (
+        db.query(models.ChatMessage)
+        .filter(models.ChatMessage.user_id == user_id)
+        .order_by(models.ChatMessage.created_at.asc())
+        .limit(limit)
+        .all()
+    )

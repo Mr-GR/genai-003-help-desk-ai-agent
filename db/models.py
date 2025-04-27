@@ -10,7 +10,7 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
 
     tickets = relationship("Ticket", back_populates="owner")
-    chat_messages = relationship("ChatMessage", back_populates="user")
+    chat_messages = relationship("ChatMessage", back_populates="user", cascade="all, delete")
 
 class Ticket(Base):
     __tablename__ = "tickets"
@@ -24,11 +24,11 @@ class Ticket(Base):
 
 class ChatMessage(Base):
     __tablename__ = "chat_messages"
+
     id = Column(Integer, primary_key=True, index=True)
-    role = Column(String, nullable=False)  # 'user' or 'ai'
-    message = Column(Text, nullable=False)
+    role = Column(String, nullable=False)
+    content = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
 
     user = relationship("User", back_populates="chat_messages")
-    

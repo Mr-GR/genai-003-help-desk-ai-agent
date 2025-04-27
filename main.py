@@ -7,6 +7,7 @@ from auth import router as auth_router
 from llm import router as llm_router
 from transcribe import router as transcribe_router
 from tickets import router as tickets_router
+from chat_history import router as chat_history_router
 from dependencies import get_current_user
 from db.schemas import TokenData
 
@@ -23,6 +24,7 @@ app.include_router(auth_router)
 app.include_router(llm_router)
 app.include_router(transcribe_router)
 app.include_router(tickets_router)
+app.include_router(chat_history_router)
 
 app.add_middleware(
     CORSMiddleware,

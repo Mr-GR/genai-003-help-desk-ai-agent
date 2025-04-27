@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from db import models, schemas, crud  # adjust if your folder structure is different
-from db.database import get_db  # ✅ Correct import
-from dependencies import get_current_user  # ✅ Already correct
+from db import models, schemas, crud
+from db.database import get_db 
+from dependencies import get_current_user  
 from typing import List
 from datetime import datetime
 from pydantic import BaseModel
@@ -33,3 +33,32 @@ def get_user_tickets(
     current_user: models.User = Depends(get_current_user)
 ):
     return db.query(models.Ticket).filter(models.Ticket.owner_id == current_user.id).all()
+
+@router.delete("/tickets", status_code=204)
+def delete_all_tickets(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    deleted = db.query(models.Ticket).filter(models.Ticket.owner_id == current_user.id).delete()
+    db.commit()
+    if deleted == 0:
+        raise HTTPException(status_code=404, detail="No ticket history found to delete.")
+    return
+
+@router.delete("/tickets/{ticket_id}", status_code=204)
+def delete_ticket_by_id(
+    ticket_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    ticket = db.query(models.Ticket).filter(
+        models.Ticket.id == ticket_id,
+        models.Ticket.owner_id == current_user.id
+    ).first()
+
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Ticket not found.")
+    
+    db.delete(ticket)
+    db.commit()
+    return

@@ -1,4 +1,3 @@
-# 📁 db/crud.py
 from sqlalchemy.orm import Session 
 from . import models, schemas
 from passlib.context import CryptContext
@@ -23,10 +22,10 @@ def create_ticket(db: Session, ticket: schemas.TicketCreate, user_id: int, respo
     db.refresh(db_ticket)
     return db_ticket
 
-def create_chat_message(db: Session, user_id: int, message: str, role: str):
+def create_chat_message(db: Session, user_id: int, content: str, role: str):
     db_message = models.ChatMessage(
         user_id=user_id,
-        message=message,
+        content=content,
         role=role
     )
     db.add(db_message)

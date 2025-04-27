@@ -1,11 +1,13 @@
-from fastapi import APIRouter, HTTPException, Depends # type: ignore
-from pydantic import BaseModel # type: ignore
-import requests, os # type: ignore
-from sentence_transformers import SentenceTransformer # type: ignore
-from qdrant_client import QdrantClient # type: ignore
-from qdrant_client.http.models import SearchRequest, PointStruct, Filter # type: ignore
+from fastapi import APIRouter, HTTPException, Depends
+from pydantic import BaseModel
+import requests, os
+from sentence_transformers import SentenceTransformer
+from qdrant_client import QdrantClient
+from qdrant_client.http.models import SearchRequest, PointStruct, Filter
 from dependencies import get_current_user
-from db import models
+from db import models, crud
+from db.database import get_db
+from sqlalchemy.orm import Session
 from typing import Optional
 
 router = APIRouter()
@@ -24,7 +26,7 @@ class AskRequest(BaseModel):
 
 class AskResponse(BaseModel):
     answer: str
-    suggest_ticket: Optional[bool] = False 
+    suggest_ticket: Optional[bool] = False
 
 def is_it_question(question: str) -> bool:
     it_keywords = [
@@ -40,10 +42,12 @@ def is_it_question(question: str) -> bool:
 @router.post("/ask", response_model=AskResponse)
 async def ask_question(
     body: AskRequest,
-    current_user: models.User = Depends(get_current_user)
-
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     if not is_it_question(body.question):
+        crud.create_chat_message(db, user_id=current_user.id, content=body.question, role="user")
+
         return {
             "answer": (
                 "This question appears to be outside of IT support.\n\n"
@@ -90,7 +94,12 @@ Question: {body.question}"""
         )
 
         result = llm_response.json()
-        return {"answer": result["choices"][0]["message"]["content"]}
+        answer = result["choices"][0]["message"]["content"]
+
+        crud.create_chat_message(db, user_id=current_user.id, content=body.question, role="user")
+        crud.create_chat_message(db, user_id=current_user.id, content=answer, role="ai")
+
+        return {"answer": answer}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

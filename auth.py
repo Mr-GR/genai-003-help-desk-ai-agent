@@ -1,3 +1,4 @@
+from dependencies import get_current_user
 from fastapi import APIRouter, Depends, HTTPException, status # type: ignore
 from sqlalchemy.orm import Session # type: ignore
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm # type: ignore
@@ -48,3 +49,8 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         )
     access_token = create_access_token(data={"sub": user.username})
     return {"access_token": access_token, "token_type": "bearer"}
+
+@router.post("/logout")
+async def logout(current_user: models.User = Depends(get_current_user)):
+    """"""
+    return {"message": "logged out successfully."}

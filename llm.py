@@ -46,8 +46,8 @@ async def ask_question(
     db: Session = Depends(get_db)
 ):
     if not is_it_question(body.question):
-        crud.create_chat_message(db, user_id=current_user.id, content=body.question, role="user")
-
+        # Save ONLY user message when it's non-IT
+        crud.create_chat_message(db, user_id=current_user.id, user_message=body.question)
         return {
             "answer": (
                 "This question appears to be outside of IT support.\n\n"
@@ -96,8 +96,12 @@ Question: {body.question}"""
         result = llm_response.json()
         answer = result["choices"][0]["message"]["content"]
 
-        crud.create_chat_message(db, user_id=current_user.id, content=body.question, role="user")
-        crud.create_chat_message(db, user_id=current_user.id, content=answer, role="ai")
+        crud.create_chat_message(
+            db,
+            user_id=current_user.id,
+            user_message=body.question,
+            ai_response=answer
+        )
 
         return {"answer": answer}
 

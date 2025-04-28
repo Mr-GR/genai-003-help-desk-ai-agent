@@ -14,20 +14,23 @@ class User(Base):
 
 class Ticket(Base):
     __tablename__ = "tickets"
+
     id = Column(Integer, primary_key=True, index=True)
-    ticket = Column(Text, nullable=False)
-    response = Column(Text, nullable=True)
+    title = Column(String(255), nullable=False)
+    user_ticket = Column(Text, nullable=False)
+    agent_response = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     owner_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("User", back_populates="tickets")
 
+
 class ChatMessage(Base):
     __tablename__ = "chat_messages"
 
     id = Column(Integer, primary_key=True, index=True)
-    role = Column(String, nullable=False)
-    content = Column(String, nullable=False)
+    user_message = Column(Text, nullable=False)
+    ai_response = Column(Text, nullable=True) 
     created_at = Column(DateTime, default=datetime.utcnow)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
 

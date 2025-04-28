@@ -1,34 +1,38 @@
-from pydantic import BaseModel, validator # type: ignore
+from pydantic import BaseModel, validator
 from typing import Optional, List
 from datetime import datetime
 import re
 
 class TicketBase(BaseModel):
-    ticket: str
+    user_ticket: str  # Required now
+    agent_response: Optional[str] = None
 
 class TicketCreate(TicketBase):
-    pass
+    pass  # inherit, no re-declare fields
 
 class TicketResponse(TicketBase):
-    response: Optional[str]
+    id: int
     created_at: datetime
 
     class Config:
         from_attributes = True
 
 class ChatMessageBase(BaseModel):
-    role: str  # 'user' or 'ai'
-    message: str
+    user_message: Optional[str]
+    ai_response: Optional[str]
 
 class ChatMessageCreate(ChatMessageBase):
     pass
 
-class ChatMessageResponse(ChatMessageBase):
+class ChatMessageResponse(BaseModel):
     id: int
+    user_message: str
+    ai_response: Optional[str]
     created_at: datetime
 
     class Config:
         from_attributes = True
+
 
 class UserBase(BaseModel):
     username: str

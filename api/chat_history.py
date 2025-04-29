@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from db import models, database
 from db.schemas import ChatMessageCreate, ChatMessageResponse
-from dependencies import get_current_user
+from api.dependencies import get_current_user
 from typing import List
 
 router = APIRouter()

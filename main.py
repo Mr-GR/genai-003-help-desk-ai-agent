@@ -3,13 +3,13 @@ import uvicorn # type: ignore
 from fastapi import FastAPI, Header, HTTPException, Depends # type: ignore
 from fastapi.middleware.cors import CORSMiddleware # type: ignore
 from dotenv import load_dotenv # type: ignore
-from auth import router as auth_router
-from llm import router as llm_router
-from transcribe import router as transcribe_router
-from tickets import router as tickets_router
-from chat_history import router as chat_history_router
-from user import router as user_router
-from dependencies import get_current_user
+from api.auth import router as auth_router
+from llm.llm import router as llm_router
+from api.transcribe import router as transcribe_router
+from api.tickets import router as tickets_router
+from api.chat_history import router as chat_history_router
+from api.user import router as user_router
+from api.dependencies import get_current_user
 from db.schemas import TokenData
 
 load_dotenv()

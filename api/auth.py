@@ -1,4 +1,4 @@
-from dependencies import get_current_user
+from .dependencies import get_current_user
 from fastapi import APIRouter, Depends, HTTPException, status # type: ignore
 from sqlalchemy.orm import Session # type: ignore
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm # type: ignore

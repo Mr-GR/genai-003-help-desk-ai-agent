@@ -4,7 +4,7 @@ import requests, os
 from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import SearchRequest, PointStruct, Filter
-from dependencies import get_current_user
+from api.dependencies import get_current_user
 from db import models, crud
 from db.database import get_db
 from sqlalchemy.orm import Session

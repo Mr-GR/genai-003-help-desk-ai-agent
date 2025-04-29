@@ -1,7 +1,8 @@
-# 📁 db/crud.py
+from typing import Optional
 from sqlalchemy.orm import Session 
 from . import models, schemas
 from passlib.context import CryptContext
+from datetime import datetime
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -22,3 +23,23 @@ def create_ticket(db: Session, ticket: schemas.TicketCreate, user_id: int, respo
     db.commit()
     db.refresh(db_ticket)
     return db_ticket
+def create_chat_message(db: Session, user_id: int, user_message: str, ai_response: Optional[str] = None):
+    db_message = models.ChatMessage(
+        user_id=user_id,
+        user_message=user_message,
+        ai_response=ai_response
+    )
+    db.add(db_message)
+    db.commit()
+    db.refresh(db_message)
+    return db_message
+
+
+def get_chat_history(db: Session, user_id: int, limit: int = 50):
+    return (
+        db.query(models.ChatMessage)
+        .filter(models.ChatMessage.user_id == user_id)
+        .order_by(models.ChatMessage.created_at.asc())
+        .limit(limit)
+        .all()
+    )

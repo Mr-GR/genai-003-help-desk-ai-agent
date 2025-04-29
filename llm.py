@@ -1,10 +1,14 @@
-from fastapi import APIRouter, HTTPException, Depends # type: ignore
-from pydantic import BaseModel # type: ignore
-import requests, os # type: ignore
-from sentence_transformers import SentenceTransformer # type: ignore
-from qdrant_client import QdrantClient # type: ignore
-from qdrant_client.http.models import SearchRequest, PointStruct, Filter # type: ignore
-from dependencies import get_current_user, TokenData
+from fastapi import APIRouter, HTTPException, Depends
+from pydantic import BaseModel
+import requests, os
+from sentence_transformers import SentenceTransformer
+from qdrant_client import QdrantClient
+from qdrant_client.http.models import SearchRequest, PointStruct, Filter
+from dependencies import get_current_user
+from db import models, crud
+from db.database import get_db
+from sqlalchemy.orm import Session
+from typing import Optional
 
 router = APIRouter()
 
@@ -22,9 +26,35 @@ class AskRequest(BaseModel):
 
 class AskResponse(BaseModel):
     answer: str
+    suggest_ticket: Optional[bool] = False
+
+def is_it_question(question: str) -> bool:
+    it_keywords = [
+        "network", "server", "API", "cloud", "Python", "JavaScript",
+        "Docker", "Git", "SQL", "debug", "DevOps", "backend", "frontend",
+        "VPN", "firewall", "IT support", "ticket", "deployment", "system",
+        "infrastructure", "IP address", "proxy", "database", "CI/CD",
+        "SSH", "terminal", "command line", "port", "DNS", "IT issue",
+        "Mac", "CCNA", "data link",
+    ]
+    return any(keyword.lower() in question.lower() for keyword in it_keywords)
 
 @router.post("/ask", response_model=AskResponse)
-async def ask_question(body: AskRequest, current_user: TokenData = Depends(get_current_user)):
+async def ask_question(
+    body: AskRequest,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    if not is_it_question(body.question):
+        crud.create_chat_message(db, user_id=current_user.id, user_message=body.question)
+        return {
+            "answer": (
+                "This question appears to be outside of IT support.\n\n"
+                "Would you like to submit this as a ticket for further review?"
+            ),
+            "suggest_ticket": True
+        }
+
     try:
         query_embedding = model.encode(body.question).tolist()
 
@@ -38,8 +68,8 @@ async def ask_question(body: AskRequest, current_user: TokenData = Depends(get_c
         context_chunks = [hit.payload.get("text", "") for hit in hits]
         combined_context = "\n---\n".join(context_chunks)
 
-        prompt = f"""Only anwser tier one support type questions:
-        
+        prompt = f"""Only answer tier one IT support type questions:
+
 Context:
 {combined_context}
 
@@ -54,7 +84,7 @@ Question: {body.question}"""
             json={
                 "model": "mistralai/Mistral-7B-Instruct-v0.1",
                 "messages": [
-                    {"role": "system", "content": "Youre a helpful assistant."},
+                    {"role": "system", "content": "You are a helpful IT support assistant."},
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": 0.7,
@@ -63,8 +93,16 @@ Question: {body.question}"""
         )
 
         result = llm_response.json()
-        print("[DEBUG] LLM raw response:", llm_response.text)
-        return {"answer": result["choices"][0]["message"]["content"]}
+        answer = result["choices"][0]["message"]["content"]
+
+        crud.create_chat_message(
+            db,
+            user_id=current_user.id,
+            user_message=body.question,
+            ai_response=answer
+        )
+
+        return {"answer": answer}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

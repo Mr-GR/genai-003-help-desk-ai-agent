@@ -35,7 +35,7 @@ def is_it_question(question: str) -> bool:
         "VPN", "firewall", "IT support", "ticket", "deployment", "system",
         "infrastructure", "IP address", "proxy", "database", "CI/CD",
         "SSH", "terminal", "command line", "port", "DNS", "IT issue",
-        "Mac",
+        "Mac", "CCNA", "data link",
     ]
     return any(keyword.lower() in question.lower() for keyword in it_keywords)
 
@@ -46,7 +46,6 @@ async def ask_question(
     db: Session = Depends(get_db)
 ):
     if not is_it_question(body.question):
-        # Save ONLY user message when it's non-IT
         crud.create_chat_message(db, user_id=current_user.id, user_message=body.question)
         return {
             "answer": (

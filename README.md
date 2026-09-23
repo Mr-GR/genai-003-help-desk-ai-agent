@@ -16,7 +16,7 @@ A local AI-powered help desk agent using:
 ### 1. Install dependencies
 
 ```bash
-pip install fastapi uvicorn qdrant-client sentence-transformers langchain pypdf python-dotenv sqlalchemy psycopg2-binary passlib[bcrypt] python-jose
+pip install -r requirements.txt
 ```
 
 ### 2. Start Qdrant Locally

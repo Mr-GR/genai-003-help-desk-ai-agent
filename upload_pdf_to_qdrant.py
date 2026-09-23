@@ -57,7 +57,7 @@ if COLLECTION_NAME not in collection_names:
     qdrant.create_collection(
         collection_name=COLLECTION_NAME,
         vectors_config=VectorParams(
-            size=model.get_sentence_embedding_dimension(),
+            size=model.get_embedding_dimension(),
             distance=Distance.COSINE
         )
     )

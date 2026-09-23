@@ -82,18 +82,25 @@ Question: {body.question}"""
                 "Content-Type": "application/json"
             },
             json={
-                "model": "mistralai/Mistral-7B-Instruct-v0.1",
+                "model": "Prism-ML/Ternary-Bonsai-27B",
                 "messages": [
                     {"role": "system", "content": "You are a helpful IT support assistant."},
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": 0.7,
-                "max_tokens": 512
+                "max_tokens": 2048
             }
         )
 
         result = llm_response.json()
-        answer = result["choices"][0]["message"]["content"]
+        if "choices" not in result:
+            raise HTTPException(
+                status_code=502,
+                detail=f"Together API error: {result.get('error', result)}"
+            )
+
+        message = result["choices"][0]["message"]
+        answer = message.get("content") or message.get("reasoning_content", "")
 
         crud.create_chat_message(
             db,
